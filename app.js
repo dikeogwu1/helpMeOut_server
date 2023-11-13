@@ -2,6 +2,15 @@ require("dotenv").config();
 require("express-async-errors");
 const express = require("express");
 const app = express();
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+
+// Configure Cloudinary with your credentials
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_KEY,
+  api_secret: process.env.CLOUD_SECRET,
+});
 
 // extra security packages
 const helmet = require("helmet");

@@ -15,6 +15,11 @@ const VideoShema = new mongoose.Schema({
     required: [true, "Please provide tag"],
     maxlength: 100,
   },
+  videoDuration: {
+    type: Number,
+    required: [true, "Please provide video duration"],
+    maxlength: 50,
+  },
 });
 
 module.exports = mongoose.model("Video", VideoShema);
