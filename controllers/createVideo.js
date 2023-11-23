@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const { BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const Video = require("../models/Video");
@@ -14,10 +15,12 @@ const createVideo = async (req, res) => {
       .json({ error: "No file uploaded" });
   }
 
-  // Process the file (e.g., save to disk, send in API response)
-
-  // Save the file to disk (adjust the path as needed)
-  const filePath = `uploads/${uploadedFile.originalname}`;
+  // Save the file to upload folder
+  const filePath = path.join(
+    __dirname,
+    "../uploads/" + `${uploadedFile.originalname}`
+  );
+  // const filePath = `uploads/${uploadedFile.originalname}`;
   fs.writeFileSync(filePath, uploadedFile.buffer);
 
   // Upload the video to Cloudinary
@@ -27,24 +30,31 @@ const createVideo = async (req, res) => {
     folder: "screenTalk_videos",
   });
 
-  if (result.duration > 300.0) {
+  if (result.duration > 200.0) {
     throw new BadRequestError(
-      "Sorry, we can't proccess videos that are longer than 5 minutes"
+      "Sorry, we can't proccess videos that's longer than 3 minutes"
     );
   }
-
-  // Save the video information to DB
-  const newVideo = new Video({
-    name: req.body.name,
-    video: result.secure_url, // Save the file path or URL to the video field
-    ip: req.body.ip,
-    videoDuration: result.duration,
-  });
-  await newVideo.save();
-  // Send a response to the client
+  console.log("user hit the server");
+  // Function to delete the video from Cloudinary
+  const deleteVideoFromCloudinary = () => {
+    cloudinary.uploader.destroy(filePath, (error, result) => {
+      if (error) {
+        console.error("Error deleting video from Cloudinary:", error);
+      } else {
+        console.log(
+          "Video deleted from Cloudinary. Cloudinary response:",
+          result
+        );
+      }
+    });
+  };
+  // Schedule the deletion after 20 minutes
+  const deletionTimeout = 20 * 60 * 1000;
+  // setTimeout(deleteVideoFromCloudinary, deletionTimeout);
   res
     .status(StatusCodes.CREATED)
-    .json({ message: "File uploaded and processed successfully" });
+    .json({ video: result.secure_url, duration: result.duration });
 };
 
 module.exports = { createVideo };
