@@ -3,6 +3,7 @@ require("express-async-errors");
 const express = require("express");
 const app = express();
 const multer = require("multer");
+const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 
 // Configure Cloudinary with your credentials
@@ -25,6 +26,7 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/auth");
 const videoRouter = require("./routes/video");
 const createVideoRouter = require("./routes/createVideo");
+const removeUnsavedVideoRouter = require("./routes/removeUnsavedVideo");
 
 // error handler
 const notFoundMiddleware = require("./middleware/not-found");
@@ -38,6 +40,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(fileUpload({ useTempFiles: true }));
 // extra packages
 app.use(helmet());
 app.use(cors());
@@ -47,6 +50,8 @@ app.use(xss());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/videos", videoRouter);
 app.use("/api/v1/createVideo", createVideoRouter);
+app.use("/api/v1/unsaved", removeUnsavedVideoRouter);
+app.use(express.static("./public"));
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

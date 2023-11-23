@@ -1,50 +1,39 @@
 const fs = require("fs");
+const path = require("path");
 const { BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const Video = require("../models/Video");
 const cloudinary = require("cloudinary").v2;
 
 const createVideo = async (req, res) => {
-  const uploadedFile = req.file; // Contains the uploaded file as a Buffer
-
   // Check if a file was uploaded
-  if (!uploadedFile) {
+  if (!req.files) {
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "No file uploaded" });
   }
 
-  // Process the file (e.g., save to disk, send in API response)
+  const uploadedFile = req.files.video;
 
-  // Save the file to disk (adjust the path as needed)
-  const filePath = `uploads/${uploadedFile.originalname}`;
-  fs.writeFileSync(filePath, uploadedFile.buffer);
-
-  // Upload the video to Cloudinary
-  const result = await cloudinary.uploader.upload(filePath, {
-    use_filename: true,
-    resource_type: "video",
-    folder: "screenTalk_videos",
-  });
-
-  if (result.duration > 300.0) {
+  if (uploadedFile.size > 18000000) {
     throw new BadRequestError(
-      "Sorry, we can't proccess videos that are longer than 5 minutes"
+      "Sorry, this video is too long. Your video should not be longer than 3 minutes"
     );
   }
 
-  // Save the video information to DB
-  const newVideo = new Video({
-    name: req.body.name,
-    video: result.secure_url, // Save the file path or URL to the video field
-    ip: req.body.ip,
-    videoDuration: result.duration,
+  // upload to Cloudinary
+  const result = await cloudinary.uploader.upload(uploadedFile.tempFilePath, {
+    resource_type: "video",
+    use_filename: true,
+    folder: "screenTalk_videos",
   });
-  await newVideo.save();
-  // Send a response to the client
-  res
-    .status(StatusCodes.CREATED)
-    .json({ message: "File uploaded and processed successfully" });
+  fs.unlinkSync(uploadedFile.tempFilePath);
+
+  res.status(StatusCodes.CREATED).json({
+    video: result.secure_url,
+    duration: result.duration,
+    id: result.public_id,
+  });
 };
 
 module.exports = { createVideo };
