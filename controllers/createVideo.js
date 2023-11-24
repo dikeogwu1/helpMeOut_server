@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const { BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const Video = require("../models/Video");
@@ -15,7 +16,11 @@ const createVideo = async (req, res) => {
   }
 
   // Save the file to upload folder
-  const filePath = `uploads/${uploadedFile.originalname}`;
+  const filePath = path.join(
+    __dirname,
+    "../uploads/" + `${uploadedFile.originalname}`
+  );
+  // const filePath = `uploads/${uploadedFile.originalname}`;
   fs.writeFileSync(filePath, uploadedFile.buffer);
 
   // Upload the video to Cloudinary
@@ -30,7 +35,7 @@ const createVideo = async (req, res) => {
       "Sorry, we can't proccess videos that's longer than 3 minutes"
     );
   }
-
+  console.log("user hit the server");
   // Function to delete the video from Cloudinary
   const deleteVideoFromCloudinary = () => {
     cloudinary.uploader.destroy(filePath, (error, result) => {
