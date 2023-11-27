@@ -35,6 +35,10 @@ const createVideo = async (req, res) => {
       "Sorry, we can't proccess videos that's longer than 3 minutes"
     );
   }
+<<<<<<< HEAD
+=======
+  console.log("user hit the server");
+>>>>>>> 614fefe5d8a7af4ac3a6af434209d2e3eae82657
   // Function to delete the video from Cloudinary
   const deleteVideoFromCloudinary = () => {
     cloudinary.uploader.destroy(filePath, (error, result) => {
