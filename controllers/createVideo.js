@@ -18,8 +18,9 @@ const createVideo = async (req, res) => {
   // Save the file to upload folder
   const filePath = path.join(
     __dirname,
-    "..public/uploads/" + `${uploadedFile.originalname}`
+    "../public/uploads/" + `${uploadedFile.originalname}`
   );
+  console.log(filePath);
   // const filePath = `uploads/${uploadedFile.originalname}`;
   fs.writeFileSync(filePath, uploadedFile.buffer);
 
