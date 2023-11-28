@@ -8,6 +8,6 @@ const upload = multer({ storage: storage });
 
 const { createVideo } = require("../controllers/createVideo");
 
-router.post("/", upload.single("video"), createVideo);
+router.post("/", createVideo);
 
 module.exports = router;

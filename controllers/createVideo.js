@@ -6,55 +6,32 @@ const Video = require("../models/Video");
 const cloudinary = require("cloudinary").v2;
 
 const createVideo = async (req, res) => {
-  const uploadedFile = req.file; // Contains the uploaded file as a Buffer
-
   // Check if a file was uploaded
-  if (!uploadedFile) {
+  if (!req.files) {
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "No file uploaded" });
   }
 
+  const uploadedFile = req.files.video;
+
+  if (uploadedFile.size > 3000000) {
+    throw new BadRequestError(
+      "Sorry, we can't proccess videos longer than 3 minutes in length"
+    );
+  }
   // Save the file to upload folder
   const filePath = path.join(
     __dirname,
-    "../public/uploads/" + `${uploadedFile.originalname}`
+    "../public/uploads/" + `${uploadedFile.name}`
   );
-  console.log(filePath);
-  // const filePath = `uploads/${uploadedFile.originalname}`;
-  fs.writeFileSync(filePath, uploadedFile.buffer);
+  await uploadedFile.mv(filePath);
 
-  // Upload the video to Cloudinary
-  const result = await cloudinary.uploader.upload(filePath, {
-    use_filename: true,
-    resource_type: "video",
-    folder: "screenTalk_videos",
+  res.status(StatusCodes.CREATED).json({
+    video: `${uploadedFile.name}`,
+    duration: null,
+    name: uploadedFile.name,
   });
-
-  if (result.duration > 200.0) {
-    throw new BadRequestError(
-      "Sorry, we can't proccess videos that's longer than 3 minutes"
-    );
-  }
-  // Function to delete the video from Cloudinary
-  const deleteVideoFromCloudinary = () => {
-    cloudinary.uploader.destroy(filePath, (error, result) => {
-      if (error) {
-        console.error("Error deleting video from Cloudinary:", error);
-      } else {
-        console.log(
-          "Video deleted from Cloudinary. Cloudinary response:",
-          result
-        );
-      }
-    });
-  };
-  // Schedule the deletion after 20 minutes
-  const deletionTimeout = 20 * 60 * 1000;
-  // setTimeout(deleteVideoFromCloudinary, deletionTimeout);
-  res
-    .status(StatusCodes.CREATED)
-    .json({ video: result.secure_url, duration: result.duration });
 };
 
 module.exports = { createVideo };
