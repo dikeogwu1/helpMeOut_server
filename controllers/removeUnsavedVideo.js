@@ -1,15 +1,11 @@
-const fs = require("fs");
-const path = require("path");
 const { BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+const cloudinary = require("cloudinary").v2;
 
 const deleteVideoFromServer = async (req, res) => {
-  const filePath = path.join(
-    __dirname,
-    "../public/uploads/" + `${req.body.data}`
-  );
-  fs.unlinkSync(filePath);
-
+  const result = await cloudinary.uploader.destroy(req.body.data, {
+    resource_type: "video",
+  });
   res.status(StatusCodes.OK).json("ok");
 };
 

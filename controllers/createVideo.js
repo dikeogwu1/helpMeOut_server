@@ -20,17 +20,19 @@ const createVideo = async (req, res) => {
       "Sorry, we can't proccess videos longer than 3 minutes in length"
     );
   }
-  // Save the file to upload folder
-  const filePath = path.join(
-    __dirname,
-    "../public/uploads/" + `${uploadedFile.name}`
-  );
-  await uploadedFile.mv(filePath);
+
+  // upload to Cloudinary
+  const result = await cloudinary.uploader.upload(uploadedFile.tempFilePath, {
+    resource_type: "video",
+    use_filename: true,
+    folder: "screenTalk_videos",
+  });
+  fs.unlinkSync(uploadedFile.tempFilePath);
 
   res.status(StatusCodes.CREATED).json({
-    video: `${uploadedFile.name}`,
-    duration: null,
-    name: uploadedFile.name,
+    video: result.secure_url,
+    duration: result.duration,
+    id: result.public_id,
   });
 };
 
