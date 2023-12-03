@@ -15,9 +15,9 @@ const createVideo = async (req, res) => {
 
   const uploadedFile = req.files.video;
 
-  if (uploadedFile.size > 15000000) {
+  if (uploadedFile.size > 18000000) {
     throw new BadRequestError(
-      "Sorry, we can't proccess videos longer than 3 minutes in length"
+      "Sorry, this video is too long. Your video should not be longer than 3 minutes"
     );
   }
 

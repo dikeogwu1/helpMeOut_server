@@ -14,7 +14,7 @@ const deleteVideoFromServer = async (req, res) => {
 
   // Schedule the deletion using node-cron (every 30 minutes)
   const cronJob = cron.schedule(
-    "0 0 */1 * *",
+    "0 */1 * * *",
     async () => {
       try {
         // Delete the video
