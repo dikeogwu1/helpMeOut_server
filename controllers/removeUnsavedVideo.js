@@ -45,7 +45,7 @@ const deleteVideoFromServer = async (req, res) => {
   const result = await cloudinary.uploader.destroy(publicId, {
     resource_type: "video",
   });
-  console.log("Video deleted:", result);
+  // console.log("Video deleted:", result);
   res.status(200).json("ok");
 };
 

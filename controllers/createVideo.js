@@ -1,8 +1,8 @@
 const fs = require("fs");
-const path = require("path");
+// const path = require("path");
 const { BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
-const Video = require("../models/Video");
+// const Video = require("../models/Video");
 const cloudinary = require("cloudinary").v2;
 
 const createVideo = async (req, res) => {
