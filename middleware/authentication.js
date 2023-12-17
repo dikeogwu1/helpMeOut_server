@@ -6,7 +6,7 @@ const auth = async (req, res, next) => {
   const authHeaders = req.headers.authorization;
 
   if (!authHeaders || !authHeaders.startsWith("Bearer")) {
-    throw new UnauthenticatedError("Login to access this feature");
+    throw new UnauthenticatedError("Please login");
   }
 
   const token = authHeaders.split(" ")[1];

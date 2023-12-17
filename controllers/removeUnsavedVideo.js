@@ -23,7 +23,7 @@ const deleteVideoFromServer = async (req, res) => {
 
   const id = req.body.data;
   // Schedule the video deletion for 3 minutes from now
-  const scheduledTime = new Date(Date.now() + 3 * 60 * 1000);
+  const scheduledTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
   schedule.scheduleJob(scheduledTime, () => {
     deleteVideo(id);
   });

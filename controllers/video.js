@@ -1,9 +1,20 @@
 const Video = require("../models/Video");
 const { StatusCodes } = require("http-status-codes");
 
-const getAllVideo = async (req, res) => {
+const getAllVideos = async (req, res) => {
   const video = await Video.find({});
   res.status(StatusCodes.OK).json({ video });
 };
 
-module.exports = { getAllVideo };
+const saveVideo = async (req, res) => {
+  req.body.user = req.user.userId;
+  const video = await Video.create(req.body);
+  res.status(StatusCodes.CREATED).json("Video saved successfully");
+};
+
+const getUserVideos = async (req, res) => {
+  const video = await Video.find({ user: req.user.userId });
+  res.status(StatusCodes.OK).json({ video });
+};
+
+module.exports = { getAllVideos, saveVideo, getUserVideos };
