@@ -16,8 +16,15 @@ const saveVideo = async (req, res) => {
     publicId: req.body.publicId,
     user: req.user.userId,
   });
+
   if (existingVideo) {
-    throw new BadRequestError("This video already exist in your dashboard");
+    const video = await Video.findByIdAndUpdate(
+      { publicId: req.body.publicId, user: req.user.userId },
+      req.body,
+      { new: true, runValidators: true }
+    );
+    res.status(StatusCodes.OK).json("Video saved successfully");
+    return;
   }
 
   const video = await Video.create(req.body);
