@@ -1,5 +1,8 @@
 const Video = require("../models/Video");
 const { StatusCodes } = require("http-status-codes");
+const checkPermissions = require("../utils/checkPermissions");
+const { BadRequestError, NotFoundError, CustomAPIError } = require("../errors");
+const cloudinary = require("cloudinary").v2;
 
 const getAllVideos = async (req, res) => {
   const video = await Video.find({});
@@ -8,6 +11,15 @@ const getAllVideos = async (req, res) => {
 
 const saveVideo = async (req, res) => {
   req.body.user = req.user.userId;
+
+  const existingVideo = await Video.findOne({
+    publicId: req.body.publicId,
+    user: req.user.userId,
+  });
+  if (existingVideo) {
+    throw new BadRequestError("This video already exist in your dashboard");
+  }
+
   const video = await Video.create(req.body);
   res.status(StatusCodes.CREATED).json("Video saved successfully");
 };
@@ -17,4 +29,53 @@ const getUserVideos = async (req, res) => {
   res.status(StatusCodes.OK).json({ video });
 };
 
-module.exports = { getAllVideos, saveVideo, getUserVideos };
+const getSingleVideo = async (req, res) => {
+  const { id: videoId } = req.params;
+  const video = await Video.findOne({ _id: videoId });
+  if (!video) {
+    throw NotFoundError(`No video with id : ${videoId}`);
+  }
+  checkPermissions(req.user.userId, video.user);
+  res.status(StatusCodes.OK).json({ video });
+};
+
+const deleteVideo = async (req, res) => {
+  const {
+    user: { userId },
+    params: { id: publicId },
+  } = req;
+
+  cloudinary.uploader.destroy(
+    publicId,
+    {
+      resource_type: "video",
+    },
+    (error, result) => {
+      if (error) {
+        throw new CustomAPIError(
+          "An error occured while trying to delete video"
+        );
+      } else {
+        console.log("Video deleted from Cloudinary");
+      }
+    }
+  );
+
+  const video = await Video.findByIdAndRemove({
+    publicId,
+    userId,
+  });
+  if (!video) {
+    throw new NotFoundError(`No video with id ${publicId}`);
+  }
+
+  res.status(StatusCodes.OK).json("Video deleted from server");
+};
+
+module.exports = {
+  getAllVideos,
+  saveVideo,
+  getUserVideos,
+  getSingleVideo,
+  deleteVideo,
+};
