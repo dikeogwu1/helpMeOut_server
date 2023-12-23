@@ -1,6 +1,6 @@
 const Video = require("../models/Video");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError, NotFoundError, CustomAPIError } = require("../errors");
+const { NotFoundError, CustomAPIError, BadRequestError } = require("../errors");
 const cloudinary = require("cloudinary").v2;
 
 const getAllVideos = async (req, res) => {
@@ -11,6 +11,13 @@ const getAllVideos = async (req, res) => {
 const saveVideo = async (req, res) => {
   req.body.user = req.user.userId;
 
+  const totalVideo = await Video.find({ user: req.user.userId });
+
+  if (totalVideo && totalVideo.length > 4) {
+    throw BadRequestError(
+      `You've reached the max number of videos allowed for a free plan`
+    );
+  }
   const existingVideo = await Video.findOne({
     publicId: req.body.publicId,
     user: req.user.userId,
@@ -39,7 +46,7 @@ const getSingleVideo = async (req, res) => {
   const { id: videoId } = req.params;
   const video = await Video.findOne({ _id: videoId, user: req.user.userId });
   if (!video) {
-    throw NotFoundError(`No video with id : ${videoId}`);
+    throw new NotFoundError(`No video with id : ${videoId}`);
   }
   res.status(StatusCodes.OK).json({ video });
 };
