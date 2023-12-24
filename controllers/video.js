@@ -11,13 +11,6 @@ const getAllVideos = async (req, res) => {
 const saveVideo = async (req, res) => {
   req.body.user = req.user.userId;
 
-  const totalVideo = await Video.find({ user: req.user.userId });
-
-  if (totalVideo && totalVideo.length > 4) {
-    throw BadRequestError(
-      `You've reached the max number of videos allowed for a free plan`
-    );
-  }
   const existingVideo = await Video.findOne({
     publicId: req.body.publicId,
     user: req.user.userId,
@@ -29,6 +22,15 @@ const saveVideo = async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
+
+    const totalVideo = await Video.find({ user: req.user.userId });
+
+    if (totalVideo && totalVideo.length > 4 && !existingVideo) {
+      throw new BadRequestError(
+        `You've reached the max number of videos allowed for a free plan`
+      );
+    }
+
     res.status(StatusCodes.OK).json("Video saved successfully");
     return;
   }
@@ -38,7 +40,7 @@ const saveVideo = async (req, res) => {
 };
 
 const getUserVideos = async (req, res) => {
-  const video = await Video.find({ user: req.user.userId });
+  const video = await Video.find({ user: req.user.userId }).sort("createdAt");
   res.status(StatusCodes.OK).json({ video });
 };
 
