@@ -19,18 +19,32 @@ const emailVideo = async (req, res) => {
   const mailOptions = {
     from: '"ScreenTalkMaster" <godsonhm3@gmail.com>',
     to: `${req.body.email}`,
-    subject: "Help video made for you",
+    subject: "Exclusive Help Video for You",
     html: `<body>
-    <h2>We're asked to send you this help video by: ${req.user.firstName} ${req.user.lastName}</h2>
-    <br/>
-    <p>ScreenTalkMaster is used for create a help videos of how to get something done on a website.</p>
-    <br/>
+    <div style="text-align: center; display: flex; align-items:center;gap:10px;">
+        <img src="https://res.cloudinary.com/dikeogwu1/image/upload/v1701431905/HelpMeOut%20Chrome%20Extension/main-icon-xl_ac3gka.png" alt="ScreenTalkMaster Brand Logo" style="max-width: 150px; margin-bottom: 20px;">
+        <h2>ScreenTalkMaster</h2>
+    </div>
+    <h2>Hello dear,</h2>
+    <p>We hope this message finds you well.</p>
+    <p>It is our pleasure to share an exclusive help video with you. This request comes from <strong>${req.user.firstName} ${req.user.lastName}</strong>, who values your time and experience.</p>
+    <p>ScreenTalkMaster is a powerful tool designed to create informative videos, assisting users in navigating through various tasks on a website with ease.</p>
+    <p>Please take a moment to view the personalized help video that was created for you by <strong>${req.user.firstName} ${req.user.lastName}</strong>:</p>
     <a href="https://screentalkmaster.netlify.app/ready/${req.body.jsonLink}" target="_blank" rel="noopener noreferrer">
-    <button>
-     Open Video
-    </button>
+        <button style="background-color: #007BFF; color: #ffffff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+            Open Video
+        </button>
     </a>
-    </body>`,
+    <p>This video is a glimpse into the capabilities of ScreenTalkMaster. To fully unlock its potential, we invite you to sign up for a ScreenTalkMaster account:</p>
+    <a href="https://screentalkmaster.netlify.app" target="_blank" rel="noopener noreferrer">
+        <button style="background-color: #28a745; color: #ffffff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+            Sign Up Now
+        </button>
+    </a>
+    <p>Signing up will give you access to our powerful tool designed to create informative videos, assisting friends and family in navigating through various tasks on a website with ease. If you have any questions or need assistance, don't hesitate to reach out. I look forward to welcoming you to the ScreenTalkMaster community!</p>
+    <p>Best regards,</p>
+    <p>The ScreenTalkMaster Team</p>
+  </body>`,
   };
 
   let info = await transport.sendMail(mailOptions);
