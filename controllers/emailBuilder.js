@@ -21,7 +21,7 @@ const emailVideo = async (req, res) => {
     to: `${req.body.email}`,
     subject: "Exclusive Help Video for You",
     html: `<body>
-    <div style="text-align: center; display: flex; align-items:center;gap:10px;">
+    <div style="text-align: center; display: flex; align-items:center;gap:10px; margin: 0 auto;">
         <img src="https://res.cloudinary.com/dikeogwu1/image/upload/v1701431905/HelpMeOut%20Chrome%20Extension/main-icon-xl_ac3gka.png" alt="ScreenTalkMaster Brand Logo" style="max-width: 150px; margin-bottom: 20px;">
         <h2>ScreenTalkMaster</h2>
     </div>
