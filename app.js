@@ -27,6 +27,7 @@ const authRouter = require("./routes/auth");
 const videoRouter = require("./routes/video");
 const createVideoRouter = require("./routes/createVideo");
 const emailBuilderRouter = require("./routes/emailBiulder");
+const supportEmailRouter = require("./routes/supportEmail");
 const removeUnsavedVideoRouter = require("./routes/removeUnsavedVideo");
 
 // error handler
@@ -51,6 +52,7 @@ app.use(xss());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/videos", videoRouter);
 app.use("/api/v1/videos", emailBuilderRouter);
+app.use("/api/v1/user", supportEmailRouter);
 app.use("/api/v1/createVideo", createVideoRouter);
 app.use("/api/v1/unsaved", removeUnsavedVideoRouter);
 app.use(express.static("./public"));
